@@ -10,6 +10,7 @@ const {createStory,
         getCollaborators,
         removeCollaborator,
         deleteStory,
+        getStoryById,
         exportStoryPDF
     } = require("../controllers/storyController");
 
@@ -37,4 +38,5 @@ router.delete(
 
 router.delete("/:storyId", authMiddleware, deleteStory);
 
+router.get("/:storyId",authMiddleware, getStoryById);
 module.exports = router;

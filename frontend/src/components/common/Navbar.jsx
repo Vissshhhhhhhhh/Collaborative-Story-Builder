@@ -9,7 +9,7 @@ const defaultAvatars = Array.from(
   (_, i) => `https://api.dicebear.com/7.x/thumbs/svg?seed=user${i}`
 );
 
-function Navbar({ onMenuClick }) {
+function Navbar({ onMenuClick =()=>{}}) {
   const navigate = useNavigate();
   const { isAuthenticated, logout ,user} = useAuth();
 

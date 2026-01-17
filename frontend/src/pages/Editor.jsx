@@ -1,11 +1,14 @@
-function Welcome() {
+import { useParams } from "react-router-dom";
+import EditorLayout from "../components/editor/EditorLayout";
+import Navbar from "../components/common/Navbar";
+function Editor() {
+  const { storyId } = useParams();
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-2xl font-bold">
-        Editor Page
-      </h1>
+    <div className="h-full w-full pt-16 flex overflow-hidden">
+      <EditorLayout storyId={storyId} />
     </div>
   );
 }
 
-export default Welcome;
+export default Editor;

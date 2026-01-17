@@ -1,12 +1,31 @@
 import axios from "axios";
 
-const API = axios.create({
-    baseURL : "https://localhost:5000/api",
-    withCredentials: true
+const CHAPTER_API = axios.create({
+  baseURL: "http://localhost:5000/api/chapters",
+  withCredentials: true,
 });
 
-export const getSidebar = (storyId) => 
-        API.get(`/chapters/sidebar/${storyId}`);
+// sidebar list
+export const getChapterSidebar = (storyId) =>
+  CHAPTER_API.get(`/sidebar/${storyId}`);
 
-export const getChapterContent = (chapterId)=>
-        API.get(`/chapter/content/${chapterId}`);
+// chapter content
+export const getChapterContent = (chapterId) =>
+  CHAPTER_API.get(`/content/${chapterId}`);
+
+// save chapter content
+export const saveChapterContent = (chapterId, content) =>
+  CHAPTER_API.patch(`/${chapterId}`, { content });
+
+// lock/unlock
+export const lockChapter = (chapterId) =>
+  CHAPTER_API.post(`/${chapterId}/lock`);
+
+export const unlockChapter = (chapterId) =>
+  CHAPTER_API.post(`/${chapterId}/unlock`);
+
+export const createChapter = (storyId, title, parentChapter = null) =>
+  CHAPTER_API.post(`/${storyId}`, {
+    title,
+    parentChapter,
+  });

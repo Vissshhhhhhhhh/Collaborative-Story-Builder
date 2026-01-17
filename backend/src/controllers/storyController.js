@@ -333,6 +333,41 @@ const deleteStory = async (req, res) => {
   }
 };
 
+const getStoryById = async (req, res) => {
+  try {
+    const { storyId } = req.params;
+
+    const story = await Story.findById(storyId).populate("author", "name");
+
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    // ✅ Permission: author or collaborator
+    const isAllowed =
+      story.author._id.toString() === req.userId ||
+      story.collaborators.some((id) => id.toString() === req.userId);
+
+    if (!isAllowed) {
+      return res.status(403).json({ message: "You are not allowed to view this story" });
+    }
+
+    res.status(200).json({
+      story: {
+        _id: story._id,
+        title: story.title,
+        author: story.author,
+        isPublished: story.isPublished,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to fetch story",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = { createStory, 
                     addCollaborator,
                     getMyOngoingStories,
@@ -342,5 +377,6 @@ module.exports = { createStory,
                     getCollaborators,
                     removeCollaborator,
                     deleteStory,
+                    getStoryById,
                     exportStoryPDF
                 };

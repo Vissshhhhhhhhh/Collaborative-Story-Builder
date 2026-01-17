@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { getSidebar, getChapterContent } from "../api/chapterApi";
+import { getChapterSidebar, getChapterContent } from "../api/chapterApi";
 
 function Reader() {
   const { source, id } = useParams(); // internal | external

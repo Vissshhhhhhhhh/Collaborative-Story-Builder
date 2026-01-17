@@ -81,7 +81,9 @@ const getChapterContent = async (req, res) => {
 
     const chapter = await Chapter.findById(chapterId)
       .populate("createdBy", "name")
-      .populate("lastEditedBy", "name");
+      .populate("lastEditedBy", "name")
+      .populate("lockedBy", "name");
+
 
     if (!chapter) {
       return res.status(404).json({ message: "Chapter not found" });

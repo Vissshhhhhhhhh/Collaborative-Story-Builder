@@ -50,3 +50,6 @@ export const deleteStory = (storyId) => INTERNAL_API.delete(`/${storyId}`);
 
 /* ===== EXTERNAL: public-domain books ===== */
 export const getExternalStories = () => EXTERNAL_API.get("/books");
+
+export const getStoryById = (storyId) =>
+    INTERNAL_API.get(`/${storyId}`);
