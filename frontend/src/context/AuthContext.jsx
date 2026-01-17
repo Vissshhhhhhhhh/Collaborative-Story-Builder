@@ -15,17 +15,24 @@ export function AuthProvider({ children }){
         let isMounted = true;
 
         async function checkAuth() {
-            try {
-            await axios.get("http://localhost:5000/api/auth/me", { withCredentials: true });
+                try {
+                        const res = await axios.get("http://localhost:5000/api/auth/me", {
+                        withCredentials: true,
+                    });
 
-            if (isMounted) {setIsAuthenticated(true);setUsers(resizeBy.data);}
-            } catch {
-            if (isMounted) {setIsAuthenticated(false);setUsers(null);}
-            } finally {
-            if (isMounted) setLoading(false);
+                    if (isMounted) {
+                        setIsAuthenticated(true);
+                        setUsers(res.data);
+                    }
+                } catch {
+                    if (isMounted) {
+                        setIsAuthenticated(false);
+                        setUsers(null);
+                    }
+                } finally {
+                    if (isMounted) setLoading(false);
+                }
             }
-        }
-
         checkAuth();
 
         return () => {
@@ -34,33 +41,45 @@ export function AuthProvider({ children }){
     }, []);
 
 
-    const Login = async (data)=>{
+    const Login = async (data) => {
         setLoading(true);
-        try{
+        try {
             await authApi.login(data);
-            setIsAuthenticated(true);    
-        }catch (err) {
+
+            const res = await axios.get("http://localhost:5000/api/auth/me", {
+            withCredentials: true,
+            });
+
+            setUsers(res.data);
+            setIsAuthenticated(true);
+        } catch (err) {
             console.error("Login failed:", err.response?.data?.message);
             throw err;
-        }
-        finally{
+        } finally {
             setLoading(false);
         }
-    }
+    };
 
-    const signup = async (data)=>{
+
+    const signup = async (data) => {
         setLoading(true);
-        try{
+        try {
             await authApi.signup(data);
-            setIsAuthenticated(true);    
+
+            const res = await axios.get("http://localhost:5000/api/auth/me", {
+            withCredentials: true,
+            });
+
+            setUsers(res.data);
+            setIsAuthenticated(true);
         } catch (err) {
             console.error("Signup failed:", err.response?.data?.message);
             throw err;
-        }
-        finally{
+        } finally {
             setLoading(false);
         }
-    }
+    };
+
 
     const logout = async () => {
         try {
@@ -72,6 +91,7 @@ export function AuthProvider({ children }){
             console.error("Logout failed:", err);
         } finally {
             setIsAuthenticated(false);
+            setUsers(null);
         }
     };
 

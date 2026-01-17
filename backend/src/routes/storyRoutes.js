@@ -7,6 +7,9 @@ const {createStory,
         getMyPublishedStories, 
         publishToggleStory, 
         getPublicPublishedStories, 
+        getCollaborators,
+        removeCollaborator,
+        deleteStory,
         exportStoryPDF
     } = require("../controllers/storyController");
 
@@ -23,5 +26,15 @@ router.patch("/:storyId/publish",authMiddleware,publishToggleStory);
 router.get("/:storyId/export/pdf",authMiddleware,exportStoryPDF);
 
 router.get("/published", getPublicPublishedStories);
+
+router.get("/:storyId/collaborators", authMiddleware, getCollaborators);
+
+router.delete(
+  "/:storyId/collaborators/:collaboratorId",
+  authMiddleware,
+  removeCollaborator
+);
+
+router.delete("/:storyId", authMiddleware, deleteStory);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPublishedStories, getExternalStories } from "../api/storyApi";
+import { getPublicPublishedStories , getExternalStories } from "../api/storyApi";
 import StoryCard from "../components/story/StoryCard";
 
 function Main(){

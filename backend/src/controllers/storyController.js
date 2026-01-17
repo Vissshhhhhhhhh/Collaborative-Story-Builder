@@ -54,7 +54,7 @@ const addCollaborator = async (req,res)=>{
             id=> id.toString() === userToInvite._id.toString()
         )){
             return res.status(400).json({
-                message:"User aalready a collaborator"
+                message:"User already a collaborator"
             });
         }
 
@@ -235,11 +235,112 @@ const exportStoryPDF = async (req, res) => {
   }
 };
 
+// Get all collaborators
+
+const getCollaborators = async (req, res) => {
+  try {
+    const { storyId } = req.params;
+
+    const story = await Story.findById(storyId)
+      .populate("collaborators", "name email");
+
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    if (story.author.toString() !== req.userId) {
+      return res.status(403).json({ message: "Only author can view collaborators" });
+    }
+
+    res.status(200).json({
+      collaborators: story.collaborators
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to fetch collaborators",
+      error: err.message
+    });
+  }
+};
+
+// Remove collaborator (Author only)
+
+const removeCollaborator = async (req, res) => {
+  try {
+    const { storyId, collaboratorId } = req.params;
+
+    const story = await Story.findById(storyId);
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    if (story.author.toString() !== req.userId) {
+      return res.status(403).json({ message: "Only author can remove collaborators" });
+    }
+
+    // ❗prevent author removal
+    if (story.author.toString() === collaboratorId.toString()) {
+      return res.status(400).json({ message: "Author cannot be removed" });
+    }
+
+    story.collaborators = story.collaborators.filter(
+      (id) => id.toString() !== collaboratorId.toString()
+    );
+
+    await story.save();
+
+    res.status(200).json({
+      message: "Collaborator removed successfully",
+      collaborators: story.collaborators
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to remove collaborator",
+      error: err.message
+    });
+  }
+};
+
+// delete a story
+
+const deleteStory = async (req, res) => {
+  try {
+    const { storyId } = req.params;
+
+    const story = await Story.findById(storyId);
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    if (story.author.toString() !== req.userId) {
+      return res.status(403).json({ message: "Only author can delete the story" });
+    }
+
+    // delete chapters first
+    await Chapter.deleteMany({ story: storyId });
+
+    // delete story
+    await Story.findByIdAndDelete(storyId);
+
+    res.status(200).json({
+      message: "Story deleted successfully"
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to delete story",
+      error: err.message
+    });
+  }
+};
+
 module.exports = { createStory, 
                     addCollaborator,
                     getMyOngoingStories,
                     getMyPublishedStories,
                     publishToggleStory,
                     getPublicPublishedStories,
+                    getCollaborators,
+                    removeCollaborator,
+                    deleteStory,
                     exportStoryPDF
                 };

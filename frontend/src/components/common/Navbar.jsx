@@ -83,7 +83,7 @@ function Navbar({ onMenuClick }) {
   return (
     <>
       {/* ===== NAVBAR ===== */}
-      <nav className="fixed top-0 left-0 h-16 w-full bg-white border-b flex items-center px-6 z-50">
+      <nav className="fixed top-0 left-0 h-16 w-full bg-white flex items-center px-6 z-50">
         {/* ✅ Left: Logo */}
         <div className="flex items-center">
           <BrandLogo />

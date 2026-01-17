@@ -1,38 +1,90 @@
 import { useEffect, useState } from "react";
-import { getOngoingStories } from "../../api/storyApi";
+import {
+  getOngoingStories,
+  publishToggle,
+  deleteStory,
+} from "../../api/storyApi";
 import StoryCard from "../story/StoryCard";
 import { useAuth } from "../../context/AuthContext";
+import AddCollaboratorModal from "../story/AddCollaborator";
+import CollaboratorsModal from "../story/Collaborators";
+import ConfirmModal from "../common/ConfirmModal";
 
 function OngoingStories() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated, loading: authLoading } = useAuth(); // Changed from useAuth to useAuth()
+  const [activeStoryTitle, setActiveStoryTitle] = useState("");
 
-  useEffect(() => {
-    async function fetchStories() {
-      if (authLoading) return;
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
-      // Prevent 401: Don't fetch if not authenticated
-      if (!isAuthenticated) {
-        setLoading(false);
-        return;
-      }
+  const [activeStoryId, setActiveStoryId] = useState(null);
 
-      try {
-        const res = await getOngoingStories();
-        setStories(res.data.stories);
-      } catch (error) {
-        console.error(
-          "Error fetching stories:",
-          error.response?.data || error.message
-        );
-      } finally {
-        setLoading(false);
-      }
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const fetchStories = async () => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
     }
 
+    try {
+      const res = await getOngoingStories();
+      setStories(res.data.stories);
+    } catch (error) {
+      console.error(
+        "Error fetching stories:",
+        error.response?.data || error.message
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchStories();
-  }, [authLoading, isAuthenticated]); // Added isAuthenticated dependency
+  }, [authLoading, isAuthenticated]);
+
+  const openAddCollaboratorModal = (storyId, storyTitle) => {
+    setActiveStoryId(storyId);
+    setActiveStoryTitle(storyTitle);
+    setShowAddModal(true);
+  };
+
+  const openViewCollaboratorsModal = (storyId, storyTitle) => {
+    setActiveStoryId(storyId);
+    setActiveStoryTitle(storyTitle);
+    setShowViewModal(true);
+  };
+
+  const openDeleteConfirm = (storyId) => {
+    setActiveStoryId(storyId);
+    setShowDeleteModal(true);
+  };
+
+  const handlePublishToggle = async (storyId) => {
+    try {
+      await publishToggle(storyId);
+      fetchStories();
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
+  };
+
+  const handleDeleteStory = async () => {
+    try {
+      await deleteStory(activeStoryId);
+      setStories((prev) => prev.filter((s) => s._id !== activeStoryId));
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    } finally {
+      setShowDeleteModal(false);
+      setActiveStoryId(null);
+    }
+  };
 
   return (
     <>
@@ -54,11 +106,55 @@ function OngoingStories() {
               story={story}
               source="internal"
               mode="dashboard"
-              onPublishToggle={() => publishToggle(story._id)}
-              onAddCollaborator={() => openCollaboratorModal(story._id)}
+              onPublishToggle={() => handlePublishToggle(story._id)}
+              onAddCollaborator={() => openAddCollaboratorModal(story._id, story.title)}
+              onViewCollaborators={() => openViewCollaboratorsModal(story._id, story.title)}
+
+              onDeleteStory={() => openDeleteConfirm(story._id)}
             />
           ))}
         </div>
+      )}
+
+      {showAddModal && (
+        <AddCollaboratorModal
+          storyId={activeStoryId}
+          storyTitle={activeStoryTitle}
+          onClose={() => {
+            setShowAddModal(false);
+            setActiveStoryId(null);
+            setActiveStoryTitle("");
+          }}
+          onAdded={() => {
+            // optional refresh if needed later
+          }}
+        />
+      )}
+
+      {showViewModal && (
+        <CollaboratorsModal
+          storyId={activeStoryId}
+          storyTitle={activeStoryTitle}
+          onClose={() => {
+            setShowViewModal(false);
+            setActiveStoryId(null);
+            setActiveStoryTitle("");
+          }}
+        />
+      )}
+
+      {showDeleteModal && (
+        <ConfirmModal
+          title="Delete Story"
+          message="This will permanently delete your story and all its chapters. Are you sure?"
+          confirmText="Yes, Delete"
+          cancelText="Cancel"
+          onConfirm={handleDeleteStory}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setActiveStoryId(null);
+          }}
+        />
       )}
     </>
   );
