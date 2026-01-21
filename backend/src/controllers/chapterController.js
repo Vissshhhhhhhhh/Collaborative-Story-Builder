@@ -114,14 +114,26 @@ const updateChapterContent = async (req, res)=>{
       return res.status(404).json({message:"Chapter not found"});
     }
 
-    //2. Find related story ( for permission check )
-    // Normalization comes here chpater edit permissions are taken from story 
-    // No duplication logic is performed
-
     const story = await Story.findById(chapter.story);
     if(!story){
       return res.status(404).json({message: "Story not found"});
     }
+    
+    if (
+        chapter.isLocked &&
+        chapter.lockedBy &&
+        chapter.lockedBy.toString() !== req.userId
+      ) {
+        return res.status(423).json({
+          message: "Chapter is locked by another user"
+        });
+      }
+
+
+    //2. Find related story ( for permission check )
+    // Normalization comes here chpater edit permissions are taken from story 
+    // No duplication logic is performed
+
 
     //3. Permission check
 

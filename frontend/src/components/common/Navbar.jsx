@@ -9,7 +9,7 @@ const defaultAvatars = Array.from(
   (_, i) => `https://api.dicebear.com/7.x/thumbs/svg?seed=user${i}`
 );
 
-function Navbar({ onMenuClick =()=>{}}) {
+function Navbar({ onMenuClick =()=>{}, page}) {
   const navigate = useNavigate();
   const { isAuthenticated, logout ,user} = useAuth();
 
@@ -111,45 +111,53 @@ function Navbar({ onMenuClick =()=>{}}) {
                   onClick={() => setDropdownOpen((prev) => !prev)}
                 />
 
-                {dropdownOpen && (
-  <div className="h-50 absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-1xl shadow-xl overflow-hidden">
-    <div className="flex items-center gap-3 px-5 py-4 border-b">
-      <img
-        src={defaultAvatars[0]}
-        alt="Profile"
-        className="w-11 h-11 rounded-full border"
-      />
-      <div className="min-w-0">
-        <p className="font-semibold text-gray-900 truncate">
-          {user?.name || "User"}
-        </p>
-        <p className="text-sm text-gray-500 truncate">
-          {user?.email || ""}
-        </p>
-      </div>
-    </div>
+                  {dropdownOpen && (
+                    <div className="h-50 absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-1xl shadow-xl overflow-hidden">
+                      <div className="flex items-center gap-3 px-5 py-4 border-b">
+                        <img
+                          src={defaultAvatars[0]}
+                          alt="Profile"
+                          className="w-11 h-11 rounded-full border"
+                        />
+                        <div className="min-w-0">
+                          <p className="font-semibold text-gray-900 truncate">
+                            {user?.name || "User"}
+                          </p>
+                          <p className="text-sm text-gray-500 truncate">
+                            {user?.email || ""}
+                          </p>
+                        </div>
+                      </div>
 
-    <button
-      onClick={async () => {
-        setDropdownOpen(false);
-        await logout();
-        navigate("/login");
-      }}
-      className="w-full py-3 text-sm bottom-0 font-medium text-gray-700 hover:bg-gray-50"
-    >
-      Logout
-    </button>
-  </div>
-)}
+                      <button
+                        onClick={async () => {
+                          setDropdownOpen(false);
+                          await logout();
+                          navigate("/login");
+                        }}
+                        className="w-full py-3 text-sm bottom-0 font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
 
               </div>
             )}
           </div>
 
           {/* ✅ Mobile menu button (opens DashboardSidebar) */}
-          <button className="md:hidden text-2xl" onClick={onMenuClick}>
-            ☰
-          </button>
+          {(page === "Dashboard" || page==="Editor") ? (
+               <button className="md:hidden text-2xl" onClick={() => setMobileMenuOpen(true)}>
+                 ☰
+               </button>
+          ):(
+               <button className="md:hidden text-2xl" onClick={onMenuClick}>
+                  ☰
+               </button>
+          )
+          }
+         
         </div>
       </nav>
 

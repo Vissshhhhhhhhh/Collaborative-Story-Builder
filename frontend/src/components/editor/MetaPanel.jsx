@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { lockChapter, unlockChapter } from "../../api/chapterApi";
 
-function MetaPanel({ chapterDetails }) {
+function MetaPanel({ chapterDetails,onRefresh }) {
   const [lockLoading, setLockLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -25,7 +25,7 @@ function MetaPanel({ chapterDetails }) {
         await lockChapter(chapterDetails._id);
         setMsg("Chapter locked ✅");
       }
-
+      await onRefresh?.();
       setTimeout(() => setMsg(""), 1500);
     } catch (err) {
       setMsg(err.response?.data?.message || "Lock/Unlock failed");
@@ -62,17 +62,7 @@ function MetaPanel({ chapterDetails }) {
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <button
-          onClick={handleLockToggle}
-          disabled={lockLoading || !chapterDetails?._id}
-          className="w-full px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition disabled:opacity-60"
-        >
-          {lockLoading
-            ? "Please wait..."
-            : isLocked
-            ? "Unlock Chapter"
-            : "Lock Chapter"}
-        </button>
+        
 
         {msg && (
           <p className="text-xs text-gray-500 mt-2 text-center">{msg}</p>

@@ -47,13 +47,15 @@ export function AuthProvider({ children }){
             await authApi.login(data);
 
             const res = await axios.get("http://localhost:5000/api/auth/me", {
-            withCredentials: true,
+                withCredentials: true,
             });
 
             setUsers(res.data);
             setIsAuthenticated(true);
         } catch (err) {
             console.error("Login failed:", err.response?.data?.message);
+            setIsAuthenticated(false);
+            setUsers(null);
             throw err;
         } finally {
             setLoading(false);

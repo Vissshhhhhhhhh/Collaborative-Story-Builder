@@ -39,7 +39,13 @@ function CreateChapterModal({
           </button>
         </div>
 
-        <div className="p-4 space-y-3">
+        <form
+          className="p-4 space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCreate();
+          }}
+        >
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -48,13 +54,14 @@ function CreateChapterModal({
           />
 
           <button
-            onClick={handleCreate}
+            type="submit"
             disabled={loading}
             className="w-full px-4 py-2 rounded-md bg-black text-white hover:bg-gray-800 transition disabled:opacity-60"
           >
             {loading ? "Creating..." : "Create"}
           </button>
-        </div>
+        </form>
+
       </div>
     </div>
   );

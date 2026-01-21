@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-function EditorHeader({ selectedChapter, onOpenSidebar, metaContent, storyTitle}) {
+function EditorHeader({ selectedChapter, onOpenSidebar, metaContent, storyTitle, chapterDetails}) {
   const [metaOpen, setMetaOpen] = useState(false);
   const metaBtnRef = useRef(null);
   const metaBoxRef = useRef(null);
@@ -20,7 +20,7 @@ function EditorHeader({ selectedChapter, onOpenSidebar, metaContent, storyTitle}
   }, [metaOpen]);
 
   return (
-    <div className="px-4 py-3 flex items-center justify-between">
+    <div className="px-4 py-1 flex items-center justify-between">
       {/* Left: Sidebar button + Title */}
       <div className="flex items-center gap-3">
         {/* ✅ Mobile sidebar open button */}
@@ -32,11 +32,19 @@ function EditorHeader({ selectedChapter, onOpenSidebar, metaContent, storyTitle}
           ☰
         </button>
 
-        <div>
+        <div className="flex flex-col">
           <h2 className="text-lg font-semibold text-gray-900">
             {storyTitle || "Story"}
           </h2>
+
+          {chapterDetails?.isLocked && (
+            <p className="text-xs font-medium text-red-600">
+              Locked by {chapterDetails?.lockedBy?.name || "another user"}
+            </p>
+          )}
         </div>
+  
+
       </div>
 
       {/* Right: Meta menu + Save */}
