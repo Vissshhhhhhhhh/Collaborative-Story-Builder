@@ -37,16 +37,17 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       {/* NAVBAR */}
-      <Navbar onMenuClick={() => setSidebarOpen(true)} />
+      <Navbar page="Dashboard" onMenuClick={() => setSidebarOpen(true)} />
 
       <div className="flex">
         {/* Mobile Overlay (ONLY when sidebar open) */}
-        {sidebarOpen && (
+       {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/40 z-[70] md:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
+
 
 
         {/* SIDEBAR */}

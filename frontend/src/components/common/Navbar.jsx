@@ -64,6 +64,7 @@ function Navbar({ onMenuClick = () => {}, page }) {
 
   const dropdownRef = useRef(null);
 
+  
   /* Close profile dropdown on outside click */
   useEffect(() => {
     function handleClickOutside(e) {
@@ -99,19 +100,18 @@ function Navbar({ onMenuClick = () => {}, page }) {
         Discover
       </NavLink>
 
-      {isAuthenticated && (
-        <NavLink
-          to="/main"
-          onClick={onClick}
-          className={({ isActive }) =>
-            isActive
-              ? "text-black font-medium"
-              : "text-gray-600 hover:text-black"
-          }
-        >
-          Explore
-        </NavLink>
-      )}
+      <NavLink
+        to="/main"
+        onClick={onClick}
+        className={({ isActive }) =>
+          isActive
+            ? "text-black font-medium"
+            : "text-gray-600 hover:text-black"
+        }
+      >
+        Explore
+      </NavLink>
+
 
       {isAuthenticated && (
         <NavLink
@@ -146,7 +146,7 @@ function Navbar({ onMenuClick = () => {}, page }) {
 
             {!isAuthenticated ? (
               <button
-                onClick={() => navigate("/login")}
+                onClick={() =>navigate("/login", { state: { from: window.location.pathname } })}
                 className="ml-4 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
               >
                 Get Started
@@ -188,7 +188,7 @@ function Navbar({ onMenuClick = () => {}, page }) {
                       onClick={async () => {
                         setDropdownOpen(false);
                         await logout();
-                        navigate("/login");
+                        navigate("/main", { replace: true });
                       }}
                       className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
                     >
@@ -202,24 +202,22 @@ function Navbar({ onMenuClick = () => {}, page }) {
             )}
           </div>
 
-          {/* ✅ Mobile menu button */}
-          {(page === "Dashboard" || page === "Editor") ? (
-            <button
-              className="md:hidden text-2xl"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              ☰
-            </button>
-          ) : (
-            <button
-              className="md:hidden text-2xl"
-              onClick={onMenuClick}
-              aria-label="Open menu"
-            >
-              ☰
-            </button>
-          )}
+          <button
+            className="md:hidden text-2xl"
+            onClick={() => {
+              if (page === "Dashboard" || page === "Editor") {
+                // ✅ Dashboard/Editor uses sidebar
+                onMenuClick?.();
+              } else {
+                // ✅ Welcome/Main/Reader uses navbar drawer
+                setMobileMenuOpen(true);
+              }
+            }}
+            aria-label="Open menu"
+          >
+            ☰
+          </button>
+
         </div>
       </nav>
 
@@ -258,7 +256,7 @@ function Navbar({ onMenuClick = () => {}, page }) {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    navigate("/login");
+                    navigate("/login", { state: { from: window.location.pathname } });
                   }}
                   className="w-full px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
                 >
@@ -269,7 +267,7 @@ function Navbar({ onMenuClick = () => {}, page }) {
                   onClick={async () => {
                     setMobileMenuOpen(false);
                     await logout();
-                    navigate("/login");
+                    navigate(getLogoutRedirect(), { replace: true });
                   }}
                   className="w-full px-4 py-2 border rounded-md hover:bg-gray-100 transition font-medium text-gray-800"
                 >

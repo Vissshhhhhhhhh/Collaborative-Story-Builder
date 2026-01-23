@@ -55,11 +55,10 @@ function ChapterSidebar({
   const getBranchesOf = (parentId) =>
     branches.filter((b) => b.parentChapter?.toString() === parentId.toString());
 
-
   return (
     <div className="h-full flex flex-col relative">
       {/* ✅ Mobile header */}
-      <div className="md:hidden flex items-center justify-between px-3 py-3">
+      <div className="md:hidden sticky top-0 bg-white z-10 flex items-center justify-between px-3 py-3 border-b border-gray-200">
         <div className="flex flex-col">
           <h3 className="text-sm font-semibold text-gray-900 break-words">
             {storyTitle}
@@ -128,7 +127,7 @@ function ChapterSidebar({
           <div className="space-y-2 mt-2">
             {normalChapters.map((ch) => {
               const chapterBranches = getBranchesOf(ch._id);
-              const isExpanded = expanded[ch._id] ?? true;
+              const isExpanded = expanded[ch._id] ?? false;
               
               return (
                 <div key={ch._id} className="space-y-1">
@@ -163,16 +162,14 @@ function ChapterSidebar({
                       {/* ✅ RIGHT: Actions INSIDE item */}
                       {!collapsed && (
                         <div className="flex items-center gap-2 shrink-0">
-                          
-
-                          {/* ✅ Dropdown toggle (only on hover) */}
+                          {/* ✅ Dropdown toggle (mobile always visible) */}
                           {chapterBranches.length > 0 && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExpanded((prev) => ({
                                   ...prev,
-                                  [ch._id]: !(prev[ch._id] ?? true),
+                                  [ch._id]: !(prev[ch._id] ?? false),
                                 }));
                               }}
                               className="hidden group-hover:flex w-7 h-7 items-center justify-center rounded-md hover:bg-gray-200 text-gray-700"
@@ -181,6 +178,7 @@ function ChapterSidebar({
                               {isExpanded ? "▾" : "▸"}
                             </button>
                           )}
+
 
                           {/* ✅ Lock icon (ALWAYS visible) */}
                           <span className="w-7 h-7 flex items-center justify-center">

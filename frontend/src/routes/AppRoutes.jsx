@@ -14,9 +14,9 @@ function AppRoutes(){
             <Routes>
                 <Route path="/" element={<Welcome />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/main" element={<ProtectedRoute><Main /></ProtectedRoute>} />
+                <Route path="/main" element={<Main />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/editor/:storyId" element={<Editor />} />
+                <Route path="/editor/:storyId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
                 <Route path="/reader/:source/:id" element={<Reader />} />
             </Routes>
         </BrowserRouter>

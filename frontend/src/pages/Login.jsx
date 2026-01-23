@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { googleLogin } from "../api/authApi";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Login() {
   const { Login, signup, loading, isAuthenticated } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
+  const location = useLocation();
+  const redirectTo = location.state?.from || "/dashboard";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,7 +52,7 @@ function Login() {
   const handleGoogleLogin = async (response) => {
     try {
       await googleLogin(response.credential);
-      window.location.href = "/dashboard";
+      window.location.href = redirectTo, { replace: true };
     } catch (err) {
       console.error("Google login failed");
       console.error(err.message);
@@ -61,7 +62,7 @@ function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/dashboard");
+      navigate(redirectTo, { replace: true });
     }
   }, [isAuthenticated, navigate]);
 

@@ -25,7 +25,8 @@ function getInitials(name) {
 function getAvatarColor(name) {
   const str = name || "user";
   let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < str.length; i++)
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
 
   const palette = [
     "bg-sky-100 text-sky-700",
@@ -52,8 +53,6 @@ function InitialsAvatar({ name }) {
   );
 }
 
-
-
 function DashboardSidebar({
   active,
   setActive,
@@ -63,37 +62,35 @@ function DashboardSidebar({
   setSidebarOpen,
 }) {
   const navigate = useNavigate();
-  const { logout, user} = useAuth();
+  const { logout, user } = useAuth();
 
   return (
     <aside
       className={`
-          fixed top-16 left-0 z-80
-          h-[calc(100vh-4rem)]
-          bg-white border-r border-gray-200
-          flex flex-col shadow-sm
+        fixed md:static
+        top-16 left-0 z-50
+        h-[calc(100vh-4rem)]
+        bg-white border-r border-gray-200
+        flex flex-col shadow-sm
 
-          transform transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0
 
           transition-[width] duration-300 ease-in-out
           ${collapsed ? "w-20" : "w-64"}
       `}
-
     >
       {/* ✅ Mobile Header (Dashboard + Close in same line) */}
       <div className="md:hidden flex items-start justify-between px-4 py-4 border-b border-gray-100">
         <div className="flex items-start gap-3">
           <InitialsAvatar name={user?.name || "User"} />
 
-
           <div className="flex flex-col">
             <h2 className="text-lg font-bold text-slate-900 whitespace-nowrap leading-none">
               Dashboard
             </h2>
 
-            {/* ✅ Move identity info slightly down */}
             <div className="mt-1.5">
               <p className="text-xs text-gray-500">
                 Signed in as{" "}
@@ -120,7 +117,6 @@ function DashboardSidebar({
         </button>
       </div>
 
-
       {/* ✅ Desktop Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
@@ -131,7 +127,7 @@ function DashboardSidebar({
 
       {/* ✅ TOP Section */}
       <div className="px-3 pt-6">
-        {/* ✅ Desktop Header / Title (ONLY desktop) */}
+        {/* ✅ Desktop Header / Title */}
         <div className="hidden md:block">
           <div
             className={`flex items-center px-1 ${
@@ -164,23 +160,16 @@ function DashboardSidebar({
               py-2.5 rounded-lg transition-all duration-200
               ${
                 active === "create"
-                  ?"border border-gray-300 bg-gray-50 text-gray-900"
+                  ? "border border-gray-300 bg-gray-50 text-gray-900"
                   : "border border-transparent text-slate-600 hover:bg-gray-50 hover:text-gray-900"
               }
             `}
           >
             <PlusCircle size={20} />
             {!collapsed && (
-              <span
-                  className={`
-                    ml-3 font-medium text-sm tracking-wide
-                    transition-all duration-200
-                    ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"}
-                  `}
-                >
-                  Create a Story
+              <span className="ml-3 font-medium text-sm tracking-wide">
+                Create a Story
               </span>
-
             )}
           </button>
 
@@ -196,23 +185,16 @@ function DashboardSidebar({
               py-2.5 rounded-lg transition-all duration-200
               ${
                 active === "ongoing"
-                 ?"border border-gray-300 bg-gray-50 text-gray-900"
-                 : "border border-transparent text-slate-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "border border-gray-300 bg-gray-50 text-gray-900"
+                  : "border border-transparent text-slate-600 hover:bg-gray-50 hover:text-gray-900"
               }
             `}
           >
             <BookOpen size={20} />
             {!collapsed && (
-              <span
-                className={`
-                  ml-3 font-medium text-sm tracking-wide
-                  transition-all duration-200
-                  ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"}
-                `}
-              >
+              <span className="ml-3 font-medium text-sm tracking-wide">
                 My Ongoing Stories
               </span>
-
             )}
           </button>
 
@@ -228,7 +210,7 @@ function DashboardSidebar({
               py-2.5 rounded-lg transition-all duration-200
               ${
                 active === "published"
-                  ?"border border-gray-300 bg-gray-50 text-gray-900"
+                  ? "border border-gray-300 bg-gray-50 text-gray-900"
                   : "border border-transparent text-slate-600 hover:bg-gray-50 hover:text-gray-900"
               }
             `}
@@ -249,7 +231,7 @@ function DashboardSidebar({
           onClick={async () => {
             await logout();
             setSidebarOpen(false);
-            navigate("/login");
+            navigate("/main", { replace: true });
           }}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border rounded-lg hover:bg-gray-100 transition font-medium text-slate-700"
         >
