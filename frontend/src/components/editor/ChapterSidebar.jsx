@@ -14,7 +14,9 @@ import CreateChapterModal from "./CreateChapterModal";
 import { socket } from "../../socket";
 import { useRef } from "react";
 import RenameChapterModal from "./RenameChapterModal";
-// import { useAuth } from "../../context/AuthContext";
+import DeleteChapterModal from "./DeleteChapterModal";
+import { deleteChapter } from "../../api/chapterApi";
+import { useAuth } from "../../context/AuthContext";
 
 function ChapterSidebar({
   storyId,
@@ -38,39 +40,48 @@ function ChapterSidebar({
   const [openCreateBranch, setOpenCreateBranch] = useState(false);
   const [branchParent, setBranchParent] = useState(null);
   const [openActionMenuId, setOpenActionMenuId] = useState(null);
+
+  //rename state
   const [openRenameModal, setOpenRenameModal] = useState(false);
   const [renameTarget, setRenameTarget] = useState(null);
 
-  //from context
-  // const { user } = useAuth();
-  // const currentUserId = user?._id || user?.id;
+  //delete state
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
-  // const isLockedByOtherUser = (chapter) => {
-  //   if (!chapter.isLocked) return false;
-  //   if (!chapter.lockedBy?._id) return false;
-  //   if (!currentUserId) return false;
+  //from Authcontext
+  const { user } = useAuth();
+  const currentUserId =
+    user?._id ||
+    user?.id ||
+    user?.userId ||
+    user?.sub ||
+    null;
 
-  //   return String(chapter.lockedBy._id) !== String(currentUserId);
-  // };
+  //helper fucntion
+  const canShowActionMenu = (item) => {
+    if (!canEdit) return false;
+    if (!item.isLocked) return true;
+    if (!item.lockedBy?._id) return false;
+    if (!currentUserId) return false;
+
+    return String(item.lockedBy._id) === String(currentUserId);
+  };
+
 
   //ref
   const actionMenuRef = useRef(null);
   //ref useEffect
   useEffect(() => {
-      function handleOutside(e) {
-        if (
-          actionMenuRef.current &&
-          !actionMenuRef.current.contains(e.target)
-        ) {
-          setOpenActionMenuId(null);
-        }
+    function handleOutside(e) {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target)) {
+        setOpenActionMenuId(null);
       }
+    }
 
-      document.addEventListener("mousedown", handleOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleOutside);
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
-
 
   //socket functions
   useEffect(() => {
@@ -87,7 +98,6 @@ function ChapterSidebar({
                 : c.lockedBy
               : null,
           };
-
         }),
       );
     };
@@ -158,7 +168,6 @@ function ChapterSidebar({
           </button>
         </div>
       </div>
-
       {/* ✅ Desktop collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
@@ -166,7 +175,6 @@ function ChapterSidebar({
       >
         {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
-
       {/* ✅ Desktop header */}
       <div className="hidden md:flex items-center justify-between px-3 pt-4 pb-2">
         {!collapsed && (
@@ -188,7 +196,6 @@ function ChapterSidebar({
           </button>
         )}
       </div>
-
       {/* ✅ Scrollable list */}
       <div className="flex-1 overflow-y-auto px-2 pb-4">
         {loading ? (
@@ -226,7 +233,9 @@ function ChapterSidebar({
                     >
                       {/* ✅ LEFT: Chapter title */}
                       {!collapsed ? (
-                        <span className="text-sm font-medium truncate">{ch.title}</span>
+                        <span className="text-sm font-medium truncate">
+                          {ch.title}
+                        </span>
                       ) : (
                         <span className="text-sm font-semibold">C</span>
                       )}
@@ -258,62 +267,64 @@ function ChapterSidebar({
                             </span>
                           )}
 
-                          {/* ✅ Three dot menu */}
-                          {canEdit && (
-                            <div className="relative">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenActionMenuId((prev) => (prev === ch._id ? null : ch._id));
-                                }}
-                                className="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-gray-200 transition"
-                                title="Actions"
-                              >
-                                <MoreVertical size={18} className="text-gray-700" />
-                              </button>
-
-                              {openActionMenuId === ch._id && (
-                                <div
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
+                          {/* ✅ Three dot menu - Only show if not locked OR locked by current user */}
+                          {canShowActionMenu(ch) && (
+                              <div className="relative">
+                                {/* Three-dot trigger */}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenActionMenuId((prev) =>
+                                      prev === ch._id ? null : ch._id,
+                                    );
+                                  }}
+                                  className="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-gray-200 transition"
+                                  title="Actions"
                                 >
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setOpenActionMenuId(null);
-                                      setRenameTarget(ch);
-                                      setOpenRenameModal(true);
-                                      setOpenActionMenuId(null);
+                                  <MoreVertical
+                                    size={18}
+                                    className="text-gray-700"
+                                  />
+                                </button>
 
-                                    }}
-                                    className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                                {/* Dropdown */}
+                                {openActionMenuId === ch._id && (
+                                  <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
                                   >
-                                    <Pencil size={16} />
-                                    Rename
-                                  </button>
+                                    {/* Rename */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenActionMenuId(null);
+                                        setRenameTarget(ch);
+                                        setOpenRenameModal(true);
+                                      }}
+                                      className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                                    >
+                                      <Pencil size={16} />
+                                      Rename
+                                    </button>
 
-                                  <button
-                                    type="button"
-                                    disabled={ch.isLocked && ch.lockedBy?._id}
-                                    onClick={() => {
-                                      if (ch.isLocked && ch.lockedBy?._id) return;
-                                      setOpenActionMenuId(null);
-                                      console.log("Delete:", ch._id);
-                                    }}
-                                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${
-                                      ch.isLocked && ch.lockedBy?._id
-                                        ? "text-gray-400 cursor-not-allowed"
-                                        : "hover:bg-red-50 text-red-600"
-                                    }`}
-                                  >
-                                    <Trash2 size={16} />
-                                    Delete
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                                    {/* Delete */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenActionMenuId(null);
+                                        setDeleteTarget(ch);
+                                        setOpenDeleteModal(true);
+                                      }}
+                                      className="w-full flex items-center gap-2 px-3 py-2 text-sm border-t hover:bg-red-50 text-red-600"
+                                    >
+                                      <Trash2 size={16} />
+                                      Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
                           {/* Lock icon */}
                           <span className="w-8 h-8 flex items-center justify-center">
@@ -326,14 +337,14 @@ function ChapterSidebar({
                         </div>
                       )}
                     </button>
-
                   </div>
 
                   {/* ✅ Branch list under chapter */}
                   {!collapsed && chapterBranches.length > 0 && isExpanded && (
                     <div className="ml-5 border-l border-gray-200 pl-3 space-y-1">
-                     {chapterBranches.map((b) => (
+                      {chapterBranches.map((b) => (
                         <div key={b._id} className="relative">
+                          {/* Branch row */}
                           <button
                             onClick={() => {
                               setSelectedChapter(b);
@@ -351,29 +362,73 @@ function ChapterSidebar({
                           >
                             <span className="truncate">{b.title}</span>
 
-                            <div className="flex items-center gap-2 shrink-0">
-                              {/* Locked by */}
+                            <div className="flex items-center gap-2 shrink-0">  
+                              {/* Locked by name */}
                               {b.isLocked && b.lockedBy?.name && (
                                 <span className="text-[11px] text-gray-600 truncate max-w-[70px]">
                                   {b.lockedBy.name}
                                 </span>
                               )}
 
-                              {/* Menu */}
-                              {canEdit && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenActionMenuId((prev) => (prev === b._id ? null : b._id));
-                                  }}
-                                  className="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-gray-200 transition"
-                                  title="Actions"
-                                >
-                                  <MoreVertical size={18} className="text-gray-700" />
-                                </button>
-                              )}
+                              {/* Three-dot menu - Only show if not locked OR locked by current user */}
+                              {canShowActionMenu(ch) && (
+                                  <div className="relative">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenActionMenuId((prev) =>
+                                          prev === b._id ? null : b._id,
+                                        );
+                                      }}
+                                      className="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-gray-200 transition"
+                                      title="Actions"
+                                    >
+                                      <MoreVertical
+                                        size={18}
+                                        className="text-gray-700"
+                                      />
+                                    </button>
 
-                              {/* Lock */}
+                                    {/* Dropdown */}
+                                    {openActionMenuId === b._id && (
+                                      <div
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="absolute right-2 top-full mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
+                                      >
+                                        {/* Rename */}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setOpenActionMenuId(null);
+                                            setRenameTarget(b);
+                                            setOpenRenameModal(true);
+                                          }}
+                                          className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                                        >
+                                          <Pencil size={16} />
+                                          Rename
+                                        </button>
+
+                                        {/* Delete */}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setOpenActionMenuId(null);
+                                            setDeleteTarget(b);
+                                            setOpenDeleteModal(true);
+                                          }}
+                                          className="w-full flex items-center gap-2 px-3 py-2 text-sm border-t hover:bg-red-50 text-red-600"
+                                        >
+                                          <Trash2 size={16} />
+                                          Delete
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                              {/* Lock icon */}
                               <span className="w-8 h-8 flex items-center justify-center">
                                 {b.isLocked ? (
                                   <Lock size={16} className="text-gray-700" />
@@ -383,52 +438,8 @@ function ChapterSidebar({
                               </span>
                             </div>
                           </button>
-
-                          {/* Branch dropdown */}
-                          {openActionMenuId === b._id && canEdit && (
-                            <div
-                              onClick={(e) => e.stopPropagation()}
-                              className="absolute right-2 top-full mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
-                            >
-                              <button
-                                onClick={() => {
-                                  setOpenActionMenuId(null);
-                                  setRenameTarget(b);
-                                  setOpenRenameModal(true);
-                                  setOpenActionMenuId(null);
-                                  // TODO: open rename modal
-                                }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 text-gray-700"
-                              >
-                                <Pencil size={16} />
-                                Rename
-                              </button>
-
-                              <button
-                                disabled={b.isLocked && b.lockedBy?._id}
-                                onClick={() => {
-                                  if (b.isLocked && b.lockedBy?._id) return;
-
-                                  setOpenActionMenuId(null);
-                                  console.log("Delete branch:", b._id);
-                                  // TODO: open delete modal
-                                }}
-                                className={`w-full flex items-center gap-2 px-3 py-2 text-sm 
-                                  ${
-                                    b.isLocked && b.lockedBy?._id
-                                      ? "text-gray-400 cursor-not-allowed"
-                                      : "hover:bg-red-50 text-red-600"
-                                  }
-                                `}
-                              >
-                                <Trash2 size={16} />
-                                Delete
-                              </button>
-                            </div>
-                          )}
                         </div>
                       ))}
-
                     </div>
                   )}
                 </div>
@@ -437,7 +448,6 @@ function ChapterSidebar({
           </div>
         )}
       </div>
-
       {/* ✅ Create Chapter Modal */}
       {openCreateChapter && (
         <CreateChapterModal
@@ -451,7 +461,6 @@ function ChapterSidebar({
           }}
         />
       )}
-
       {/* ✅ Create Branch Modal */}
       {openCreateBranch && (
         <CreateChapterModal
@@ -468,24 +477,38 @@ function ChapterSidebar({
             await loadSidebar();
           }}
         />
-      )}g
-
+      )}
       {/*rename modal */}
       {openRenameModal && renameTarget && (
-          <RenameChapterModal
-            chapter={renameTarget}
-            onClose={() => {
-              setOpenRenameModal(false);
-              setRenameTarget(null);
-            }}
-            onSuccess={async () => {
-              await loadSidebar();
-              setOpenRenameModal(false);
-              setRenameTarget(null);
-            }}
-          />
-        )}
-
+        <RenameChapterModal
+          chapter={renameTarget}
+          onClose={() => {
+            setOpenRenameModal(false);
+            setRenameTarget(null);
+          }}
+          onSuccess={async () => {
+            await loadSidebar();
+            setOpenRenameModal(false);
+            setRenameTarget(null);
+          }}
+        />
+      )}
+      {/* delete modale render */}
+      {openDeleteModal && deleteTarget && (
+        <DeleteChapterModal
+          chapter={deleteTarget}
+          onClose={() => {
+            setOpenDeleteModal(false);
+            setDeleteTarget(null);
+          }}
+          onConfirm={async () => {
+            await deleteChapter(deleteTarget._id);
+            await loadSidebar();
+            setOpenDeleteModal(false);
+            setDeleteTarget(null);
+          }}
+        />
+      )}
     </div>
   );
 }

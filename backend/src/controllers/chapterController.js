@@ -447,7 +447,7 @@ const renameChapterTitle = async (req, res) => {
   }
 };
 
-// ✅ Delete chapter/branch
+// ✅ Delete chapter or branch
 const deleteChapter = async (req, res) => {
   try {
     const { chapterId } = req.params;
@@ -462,27 +462,52 @@ const deleteChapter = async (req, res) => {
       return res.status(404).json({ message: "Story not found" });
     }
 
-    // ✅ Only author can delete chapters/branches
-    if (story.author.toString() !== req.userId) {
-      return res.status(403).json({ message: "Only author can delete" });
+    // 🔒 LOCK_DELETE_SYNC (ADD HERE)
+    const now = new Date();
+
+    if (
+      chapter.isLocked &&
+      chapter.lockedBy &&
+      chapter.lockedBy.toString() !== req.userId &&
+      chapter.lockExpiresAt &&
+      chapter.lockExpiresAt > now
+    ) {
+      return res.status(423).json({
+        message: "Chapter is locked by another user",
+      });
     }
 
-    // ✅ If parent chapter deleting → also delete its branches
+    // ✅ Permission: author OR collaborator
+    const isAllowed =
+      story.author.toString() === req.userId ||
+      story.collaborators.some((id) => id.toString() === req.userId);
+
+    if (!isAllowed) {
+      return res.status(403).json({ message: "Not allowed to delete" });
+    }
+
+    // ✅ If deleting a chapter → delete its branches first
     if (!chapter.isBranch) {
       await Chapter.deleteMany({ parentChapter: chapter._id });
     }
 
-    // ✅ Delete selected chapter/branch
+    // ✅ Delete selected chapter or branch
     await Chapter.findByIdAndDelete(chapterId);
 
-    return res.status(200).json({ message: "Chapter deleted successfully" });
+    return res.status(200).json({
+      message: chapter.isBranch
+        ? "Branch deleted successfully"
+        : "Chapter and its branches deleted successfully",
+    });
   } catch (err) {
     return res.status(500).json({
-      message: "Failed to delete chapter",
+      message: "Failed to delete",
       error: err.message,
     });
   }
 };
+
+
 
 module.exports = {
   createChapter,

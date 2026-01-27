@@ -75,4 +75,6 @@ router.get("/public/sidebar/:storyId", getPublicChapterSidebar);
 
 router.get("/public/content/:chapterId", getPublicChapterContent);
 
+router.delete("/:chapterId", authMiddleware, deleteChapter);
+
 module.exports = router;

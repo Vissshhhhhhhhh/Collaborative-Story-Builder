@@ -41,3 +41,6 @@ export const getPublicChapterContent = (chapterId) =>
 //rename api
 export const renameChapter = (chapterId, title) =>
   CHAPTER_API.patch(`/${chapterId}/rename`, { title });
+//delete api
+export const deleteChapter = (chapterId) =>
+  CHAPTER_API.delete(`/${chapterId}`);
