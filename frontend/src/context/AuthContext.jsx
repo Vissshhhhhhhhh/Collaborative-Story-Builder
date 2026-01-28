@@ -4,35 +4,38 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+// ✅ Single source of truth for backend URL
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUsers] = useState(null);
+  const [user, setUser] = useState(null);
 
-  // getting auth status from backend while the state var
-  // gets refreshed when page reloads
+  // ✅ Restore auth on page refresh
   useEffect(() => {
     let isMounted = true;
 
     async function checkAuth() {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${API_BASE}/api/auth/me`, {
           withCredentials: true,
         });
 
         if (isMounted) {
           setIsAuthenticated(true);
-          setUsers({ ...res.data, id: res.data._id || res.data.id });
+          setUser({ ...res.data, id: res.data.userId });
         }
-      } catch {
+      } catch (err) {
         if (isMounted) {
           setIsAuthenticated(false);
-          setUsers(null);
+          setUser(null);
         }
       } finally {
         if (isMounted) setLoading(false);
       }
     }
+
     checkAuth();
 
     return () => {
@@ -40,68 +43,74 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  // ✅ Email / Password Login
   const Login = async (data) => {
     setLoading(true);
     try {
       await authApi.login(data);
 
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
+      const res = await axios.get(`${API_BASE}/api/auth/me`, {
         withCredentials: true,
       });
 
-      setUsers({ ...res.data, id: res.data._id || res.data.id });
+      setUser({ ...res.data, id: res.data.userId });
       setIsAuthenticated(true);
     } catch (err) {
       console.error("Login failed:", err.response?.data?.message);
       setIsAuthenticated(false);
-      setUsers(null);
+      setUser(null);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ Signup
   const signup = async (data) => {
     setLoading(true);
     try {
       await authApi.signup(data);
 
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
+      const res = await axios.get(`${API_BASE}/api/auth/me`, {
         withCredentials: true,
       });
 
-      setUsers({ ...res.data, id: res.data._id || res.data.id });
+      setUser({ ...res.data, id: res.data.userId });
       setIsAuthenticated(true);
     } catch (err) {
       console.error("Signup failed:", err.response?.data?.message);
+      setIsAuthenticated(false);
+      setUser(null);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ Google login success (after cookie is set by backend)
   const googleLoginSuccess = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
+      const res = await axios.get(`${API_BASE}/api/auth/me`, {
         withCredentials: true,
       });
 
-      setUsers({ ...res.data, id: res.data._id || res.data.id });
+      setUser({ ...res.data, id: res.data.userId });
       setIsAuthenticated(true);
     } catch (err) {
       console.error("Fetch user failed:", err.response?.data?.message);
       setIsAuthenticated(false);
-      setUsers(null);
+      setUser(null);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ Logout
   const logout = async () => {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
+      await fetch(`${API_BASE}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -109,14 +118,14 @@ export function AuthProvider({ children }) {
       console.error("Logout failed:", err);
     } finally {
       setIsAuthenticated(false);
-      setUsers(null);
+      setUser(null);
     }
   };
 
+  // ✅ Update user after profile edit
   const updateUserInContext = (newUser) => {
-    setUsers(newUser);
+    setUser(newUser);
   };
-
 
   return (
     <AuthContext.Provider
@@ -135,4 +144,5 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
 export const useAuth = () => useContext(AuthContext);
