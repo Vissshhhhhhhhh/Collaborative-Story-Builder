@@ -14,9 +14,15 @@ app.use(cookieParser());
 /*
     Middleware section
 */
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:4173"
+];
+
 app.use(cors({
-    origin:"http://localhost:5173",
-    credentials:true
+  origin: allowedOrigins,
+  credentials: true
 }));
 
 app.use(express.json());

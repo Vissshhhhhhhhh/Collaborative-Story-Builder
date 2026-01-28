@@ -12,10 +12,11 @@ router.get("/me",authMiddleware, getMe);
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    path:"/"
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    path: "/"
   });
+
 
   res.status(200).json({
     message: "Logged out successfully"

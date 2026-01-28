@@ -25,10 +25,11 @@ const signup = async (req, res)=>{
 
         res.cookie("token", token, {
           httpOnly: true,
-          sameSite: "lax",
           secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
           maxAge: 24 * 60 * 60 * 1000
         });
+
 
         res.status(201).json({
             message:"User registered successfully",
@@ -58,12 +59,13 @@ const Login = async (req,res)=>{
         const token = jwt.sign({userId : user._id},process.env.JWT_SECRET,{expiresIn:"1d"});
 
         //sends response via cookie
-        res.cookie("token", token, {
-          httpOnly: true,
-          sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
-          maxAge: 24 * 60 * 60 * 1000 // 1 day
-         });
+         res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+            maxAge: 24 * 60 * 60 * 1000
+          });
+
 
         res.status(200).json({
           message: "Login Successful"
@@ -112,12 +114,13 @@ const googleLogin = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.cookie("token", jwtToken, {
+    res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000
     });
+
 
     res.status(200).json({
       message: "Google login successful"
