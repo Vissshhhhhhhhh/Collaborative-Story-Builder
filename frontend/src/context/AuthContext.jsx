@@ -54,11 +54,13 @@ export function AuthProvider({ children }) {
       });
 
       setUser({ ...res.data, id: res.data.userId });
+      console.log(user);
       setIsAuthenticated(true);
     } catch (err) {
       console.error("Login failed:", err.response?.data?.message);
       setIsAuthenticated(false);
       setUser(null);
+      throw err;
     } finally {
       setLoading(false);
     }

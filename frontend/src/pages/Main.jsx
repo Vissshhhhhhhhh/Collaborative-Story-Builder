@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getPublicPublishedStories, getExternalStories } from "../api/storyApi";
 import StoryCard from "../components/story/StoryCard";
 import Navbar from "../components/common/Navbar";
-
+import Loader from "../components/common/Loader"
 
 function Main() {
   const [internalStories, setInternalStories] = useState([]);
@@ -47,7 +47,7 @@ function Main() {
   if (loading) {
     return (
       <div className="p-6">
-        <p className="text-gray-600">Loading stories...</p>
+        <Loader />
       </div>
     );
   }
