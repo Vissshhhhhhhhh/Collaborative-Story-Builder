@@ -11,9 +11,7 @@ const userRoutes = require("./routes/userRoutes");
 const app = express();
 app.use(cookieParser());
 
-/*
-    Middleware section
-*/
+  
 const allowedOrigins = [
   process.env.FRONTEND_URL, // Vercel
   "http://localhost:5173",

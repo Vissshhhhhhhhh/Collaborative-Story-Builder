@@ -97,7 +97,7 @@ function PublishedStories() {
           <p className="text-lg">No published stories yet.</p>
         </div>
       ) : (
-        <div className="grid w-full justify-items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 items-start">
           {stories.map((story) => (
             <StoryCard
               key={story._id}

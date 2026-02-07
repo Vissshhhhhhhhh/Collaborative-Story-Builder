@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 
 import Navbar from "../components/common/Navbar";
+import { Mail, Linkedin } from "lucide-react";
+import Img from "../assets/story2.jpg";
 
 function Welcome() {
   const navigate = useNavigate();
@@ -64,21 +66,19 @@ function Welcome() {
 
   return (
     <div className="min-h-screen pt-16 relative overflow-hidden bg-gradient-to-b from-slate-50 via-gray-100 to-slate-100">
-      {/* ✅ Use YOUR navbar */}
       <Navbar page="Welcome" />
 
-      {/* ✅ Soft color blobs (professional look) */}
+      {/* Soft blobs */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full bg-indigo-200/40 blur-3xl" />
         <div className="absolute top-32 -right-40 w-[520px] h-[520px] rounded-full bg-emerald-200/35 blur-3xl" />
         <div className="absolute bottom-[-180px] left-1/3 w-[620px] h-[620px] rounded-full bg-violet-200/35 blur-3xl" />
       </div>
 
-      {/* ✅ Main wrapper */}
       <div className="relative max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-14">
-        {/* ✅ Hero */}
+
+        {/* ================= HERO (UNCHANGED) ================= */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          {/* Left Text */}
           <div>
             <p className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 bg-white/80 backdrop-blur border border-gray-200 px-3 py-1.5 rounded-full">
               <Sparkles size={16} className="text-indigo-700" />
@@ -112,7 +112,7 @@ function Welcome() {
             </div>
           </div>
 
-          {/* Right Rectangle (feature preview) */}
+          {/* Top features (UNCHANGED) */}
           <div className="bg-white/85 backdrop-blur border border-gray-200 rounded-2xl shadow-md p-6 md:p-7">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -149,7 +149,7 @@ function Welcome() {
           </div>
         </div>
 
-        {/* ✅ Editor features rectangle */}
+        {/* ================= EDITOR FEATURES ================= */}
         <div className="mt-10 bg-white/85 backdrop-blur border border-gray-200 rounded-2xl shadow-md overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
             <div>
@@ -169,7 +169,40 @@ function Welcome() {
             </button>
           </div>
 
-          <div className="p-6">
+          {/* 🔹 MOBILE SLIDER (NEW – ONLY FOR MOBILE) */}
+          <div className="md:hidden p-6">
+            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+              {editorFeatures.map((item) => (
+                <div
+                  key={item.title}
+                  className="
+                    min-w-[85%]
+                    snap-center
+                    rounded-2xl
+                    border border-gray-200
+                    p-4
+                    bg-gradient-to-b from-white to-gray-50
+                    shadow-sm
+                  "
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+                      {item.icon}
+                    </div>
+
+                    <p className="font-semibold text-gray-900">{item.title}</p>
+                  </div>
+
+                  <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 🔹 DESKTOP GRID (UNCHANGED) */}
+          <div className="hidden md:block p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {editorFeatures.map((item) => (
                 <div
@@ -191,7 +224,7 @@ function Welcome() {
               ))}
             </div>
 
-            {/* CTA Banner */}
+            {/* CTA (UNCHANGED) */}
             <div className="mt-6 rounded-2xl border border-gray-200 bg-gradient-to-r from-gray-900 via-slate-900 to-gray-900 text-white p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm">
               <div>
                 <p className="font-bold text-lg">Publish & share your stories</p>
@@ -210,12 +243,103 @@ function Welcome() {
           </div>
         </div>
 
-        {/* ✅ Footer (same style as before, NOT removed) */}
-        <footer className="mt-12 border-t border-gray-200 pt-6 text-sm text-gray-600 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} StoryBuilder. All rights reserved.</p>
-          <p className="text-gray-500">
-            Built for collaborative writing and creative branching.
-          </p>
+        {/* ================= ABOUT (UNCHANGED) ================= */}
+        <div className="mt-12 bg-white/85 backdrop-blur border border-gray-200 rounded-2xl shadow-md overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center px-6 py-8 md:px-10 md:py-12">
+
+            {/* Left Content */}
+            <div>
+              <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                About StoryBuilder
+              </p>
+
+              <h2 className="mt-3 text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                Built for collaborative storytelling
+              </h2>
+
+              <p className="mt-4 text-sm sm:text-base text-gray-600 leading-relaxed max-w-xl">
+                Modern Story writing platform designed for creators who value
+                structure, collaboration, and creative freedom. Writers can organize
+                chapters, explore alternate story branches, and collaborate seamlessly
+                without conflicts in a single professional workspace.
+              </p>
+
+              <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed max-w-xl">
+                With a focused editor, intelligent chapter locking, and seamless publishing,
+                StoryBuilder enables creators to publish their stories and share them publicly.
+                Published stories can be read by anyone, while authors retain full control
+                over their content and creative process.
+              </p>
+            </div>
+
+            {/* Right Image — Desktop only */}
+            <div className="hidden lg:flex justify-end">
+              <div
+                className="
+                  w-full max-w-sm
+                  rounded-2xl border border-gray-200
+                  bg-gradient-to-b from-white to-gray-50
+                  p-3 shadow-sm
+                  transform transition-all duration-300
+                  hover:-translate-y-2 hover:shadow-md
+                "
+              >
+                <img
+                  src={Img}
+                  alt="StoryBuilder collaboration illustration"
+                  className="w-full h-[240px] rounded-xl object-cover"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+        {/* ================= FOOTER (UNCHANGED) ================= */}
+        <footer className="mt-16 border-t border-gray-200 text-sm text-gray-600">
+          <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+              <div className="max-w-md">
+                <p className="text-base font-semibold text-gray-900">
+                  StoryBuilder
+                </p>
+                <p className="mt-2 text-gray-500 leading-relaxed">
+                  A collaborative platform for structured storytelling.
+                </p>
+              </div>
+
+              <div className="md:text-right">
+                <p className="text-base font-semibold text-gray-900">
+                  Contact
+                </p>
+
+                <div className="mt-3 flex flex-col items-start md:items-end gap-3">
+                  <a
+                    href="mailto:viswanathpaarthiban1@gmail.com"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
+                  >
+                    <Mail size={18} />
+                    Email
+                  </a>
+
+                  <a
+                    href="https://www.linkedin.com/in/viswanathpaarthiban/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
+                  >
+                    <Linkedin size={18} />
+                    LinkedIn
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-500">
+              © {new Date().getFullYear()} StoryBuilder. All rights reserved.
+            </div>
+          </div>
         </footer>
       </div>
     </div>

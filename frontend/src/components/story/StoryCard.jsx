@@ -130,22 +130,7 @@ function StoryCard({
           />
         </div>
         {/* ✅ PDF Download (Explore only) */}
-        {mode === "main" && source === "internal" && (
-          <button
-            onClick={handleDownloadPDF}
-            title="Download as PDF"
-            className="
-                absolute top-2 right-2 z-20
-                bg-white/90 hover:bg-white
-                border border-gray-300
-                rounded-full p-2
-                shadow-sm transition
-                cursor-pointer
-              "
-          >
-            <Download size={16} className="text-gray-700" />
-          </button>
-        )}
+        
       </div>
 
       {/* ✅ Bottom section SMALLER in desktop */}
@@ -157,6 +142,21 @@ function StoryCard({
         </div>
 
         <div className="relative w-10 flex justify-end z-50 pointer-events-auto">
+          {/* Download button (Explore / Main only) */}
+          {mode === "main" && source === "internal" && (
+            <button
+              onClick={handleDownloadPDF}
+              title="Download as PDF"
+              className="
+               p-2 rounded-lg
+                hover:bg-gray-100
+                transition
+              "
+            >
+              <Download size={16} className="text-gray-700" />
+            </button>
+          )}
+
           {mode !== "main" && isAuthor ? (
             <>
               

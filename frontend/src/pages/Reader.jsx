@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
+import { ChevronDown } from "lucide-react";
 import {
   getExternalStoryById,
   fetchExternalTextByUrl,
@@ -20,6 +21,7 @@ function Reader() {
   const [chapters, setChapters] = useState([]);
   const [selectedChapterId, setSelectedChapterId] = useState(null);
   const [chapterContent, setChapterContent] = useState("");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // External
   const [externalBook, setExternalBook] = useState(null);
@@ -146,6 +148,57 @@ function Reader() {
         )}
 
         {/* ✅ MAIN READER LAYOUT (ONLY RIGHT CONTENT SCROLLS) */}
+        {/* ✅ MOBILE CHAPTER DROPDOWN TOGGLE */}
+        {isInternal && (
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setMobileSidebarOpen((p) => !p)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-900 transition"
+            >
+              <span>
+                {selectedChapterTitle}
+              </span>
+
+              <ChevronDown
+                className={`w-5 h-5 transition-transform duration-300 ${
+                  mobileSidebarOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {/* ✅ DROPDOWN PANEL */}
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                mobileSidebarOpen ? "max-h-[400px] mt-2" : "max-h-0"
+              }`}
+            >
+              <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-2 space-y-1">
+                {chapters.map((ch) => {
+                  const active = ch._id === selectedChapterId;
+
+                  return (
+                    <button
+                      key={ch._id}
+                      onClick={() => {
+                        handleSelectChapter(ch._id);
+                        setMobileSidebarOpen(false); // ✅ close after select
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-xl text-sm transition ${
+                        active
+                          ? "bg-gray-100 text-gray-900 border border-gray-200"
+                          : "hover:bg-gray-50 text-gray-700"
+                      }`}
+                    >
+                      {ch.title || "Untitled Chapter"}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {loading ? (
           <div className="bg-white border border-gray-200 rounded-2xl p-6 text-gray-600">
             Loading reader...
