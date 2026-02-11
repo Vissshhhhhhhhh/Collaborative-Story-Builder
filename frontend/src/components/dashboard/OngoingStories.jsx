@@ -13,7 +13,7 @@ import ConfirmModal from "../common/ConfirmModal";
 import EditStoryModal from "../story/EditStoryModal"; // ✅ ADD
 import { uploadStoryCover } from "../../api/storyApi";
 
-function OngoingStories() {
+function OngoingStories({ sidebarOpen = false, navbarMenuOpen = false }) {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeStoryTitle, setActiveStoryTitle] = useState("");
@@ -147,6 +147,8 @@ function OngoingStories() {
               story={story}
               source="internal"
               mode="dashboard"
+              sidebarOpen={sidebarOpen}
+              navbarMenuOpen={navbarMenuOpen}
               onPublishToggle={() => handlePublishToggle(story._id)}
               onAddCollaborator={() =>
                 openAddCollaboratorModal(story._id, story.title)

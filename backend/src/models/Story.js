@@ -39,10 +39,16 @@ const storySchema = new mongoose.Schema(
             type: Boolean,
             default:false
         }
-    },{
+    },
+    {
         timestamps:true
     }
 );
 
+// ✅ Add indexes for optimized queries
+storySchema.index({ isPublished: 1 });
+storySchema.index({ isPublished: 1, updatedAt: -1 });
+
 module.exports = mongoose.model("story",storySchema);
+
 

@@ -57,7 +57,7 @@ function InitialsAvatar({ name, size = "md", className = "" }) {
   );
 }
 
-function Navbar({ onMenuClick = () => {}, page }) {
+function Navbar({ onMenuClick = () => {}, page, onMobileMenuChange }) {
   const navigate = useNavigate();
   const { isAuthenticated, logout, user } = useAuth();
 
@@ -68,6 +68,13 @@ function Navbar({ onMenuClick = () => {}, page }) {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const dropdownRef = useRef(null);
+
+  // Notify parent when mobile menu state changes
+  useEffect(() => {
+    if (onMobileMenuChange) {
+      onMobileMenuChange(mobileMenuOpen);
+    }
+  }, [mobileMenuOpen, onMobileMenuChange]);
 
   /* Close profile dropdown on outside click */
   useEffect(() => {

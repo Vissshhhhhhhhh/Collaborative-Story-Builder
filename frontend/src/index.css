@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 /* ✅ Make Quill editor fill container */
 .ql-container {
   height: 100% !important;

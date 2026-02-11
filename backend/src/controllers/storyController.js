@@ -183,7 +183,8 @@ const getPublicPublishedStories = async (req, res) => {
       { title: 1, description: 1, coverImage: 1, author: 1, createdAt: 1 },
     )
       .populate("author", "name")
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
     res.status(200).json({ stories });
   } catch (err) {

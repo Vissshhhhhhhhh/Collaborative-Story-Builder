@@ -150,13 +150,15 @@ function ChapterSidebar({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            className="p-2 rounded-md hover:bg-gray-100 transition-colors text-2xl font-semibold"
-            title="Create chapter"
-            onClick={() => setOpenCreateChapter(true)}
-          >
-            +
-          </button>
+          {!collapsed && (
+            <button
+              className="p-2 rounded-md hover:bg-gray-100 transition-colors text-2xl font-semibold"
+              title="Create chapter"
+              onClick={() => setOpenCreateChapter(true)}
+            >
+              +
+            </button>
+          )}
 
           <button
             onClick={() => setSidebarOpen(false)}
@@ -214,18 +216,20 @@ function ChapterSidebar({
                   {/* ✅ Chapter item (ChatGPT-style: icons inside the same item) */}
                   <div key={ch._id} className="space-y-1">
                     <button
-                      onClick={() => {
+                      onClick={!collapsed ? () => {
                         setSelectedChapter(ch);
                         setSidebarOpen(false);
-                      }}
+                      } : undefined}
                       className={`
                         group w-full flex items-center justify-between
-                        ${collapsed ? "px-2 justify-center" : "px-3"}
+                        ${collapsed ? "px-2 justify-center cursor-default" : "px-3"}
                         py-2.5 rounded-lg border transition
                         ${
                           selectedChapter?._id === ch._id
                             ? "bg-gray-100 text-gray-900 border-gray-300"
-                            : "bg-white text-gray-700 border-gray-200 hover:bg-gray-100"
+                            : collapsed
+                              ? "bg-white text-gray-700 border-gray-200"
+                              : "bg-white text-gray-700 border-gray-200 hover:bg-gray-100"
                         }
                       `}
                       title={collapsed ? ch.title : undefined}

@@ -8,6 +8,8 @@ function Main() {
   const [internalStories, setInternalStories] = useState([]);
   const [externalStories, setExternalStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
 
   // ✅ Filter: all | internal | external
   const [filter, setFilter] = useState("all");
@@ -54,7 +56,7 @@ function Main() {
 
   return (
      <div className="min-h-screen bg-gray-100 pt-16">
-          <Navbar page="Main" />
+          <Navbar page="Main" onMobileMenuChange={setMobileMenuOpen} />
           <div className="p-4 md:p-8 space-y-8">
             {/* ✅ Header + Filter */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -129,7 +131,7 @@ function Main() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                     {internalStories.map((story) => (
-                      <StoryCard key={story._id} story={story} source="internal" />
+                      <StoryCard key={story._id} story={story} source="internal" mobileMenuOpen={mobileMenuOpen} />
                     ))}
                   </div>
                 )}
@@ -155,7 +157,7 @@ function Main() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {externalStories.map((book) => (
-                      <StoryCard key={book.id} story={book} source="external" />
+                      <StoryCard key={book.id} story={book} source="external" mobileMenuOpen={mobileMenuOpen} />
                     ))}
                   </div>
 

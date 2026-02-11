@@ -17,6 +17,9 @@ function StoryCard({
   hideAddCollaborator = false,
   viewOnlyCollaborators = false,
   isPublishedSection = false,
+  mobileMenuOpen = false,
+  sidebarOpen = false,
+  navbarMenuOpen = false,
 }) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -99,7 +102,7 @@ function StoryCard({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow relative overflow-visible md:h-[170px] flex flex-col">
+    <div className="bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow relative overflow-visible md:h-[170px] flex flex-col group">
       {/* ✅ Image fixed height (desktop smaller) */}
       <div
         className="h-[140px] md:h-[120px] w-full cursor-pointer relative z-10"
@@ -134,16 +137,32 @@ function StoryCard({
       </div>
 
       {/* ✅ Bottom section SMALLER in desktop */}
-      <div className="px-3 py-2 md:py-0 flex items-center gap-2 md:h-12 flex-1">
+      <div className="px-3 py-2 md:py-0 flex items-center gap-2 md:h-12 flex-1 relative">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-700 line-clamp-1 leading-4">
             {title}
           </p>
+          {/* ✅ Show author name for internal stories in main mode */}
+          {mode === "main" && source === "internal" && story?.author?.name && (
+            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+              by {story.author.name}
+            </p>
+          )}
         </div>
 
+        {/* ✅ Description tooltip on hover (only if description exists) */}
+        {mode === "main" && source === "internal" && story?.description && (
+          <div className="absolute left-0 bottom-full mb-2 w-full px-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-[100]">
+            <div className="bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl">
+              <p className="line-clamp-3">{story.description}</p>
+              <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+            </div>
+          </div>
+        )}
+
         <div className="relative w-10 flex justify-end z-50 pointer-events-auto">
-          {/* Download button (Explore / Main only) */}
-          {mode === "main" && source === "internal" && (
+          {/* Download button (Explore / Main only) - Hide when mobile menu is open */}
+          {mode === "main" && source === "internal" && !mobileMenuOpen && (
             <button
               onClick={handleDownloadPDF}
               title="Download as PDF"
@@ -157,7 +176,7 @@ function StoryCard({
             </button>
           )}
 
-          {mode !== "main" && isAuthor ? (
+          {mode !== "main" && isAuthor && !sidebarOpen && !navbarMenuOpen ? (
             <>
               
               <button

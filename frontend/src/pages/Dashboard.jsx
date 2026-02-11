@@ -4,12 +4,14 @@ import OngoingStories from "../components/dashboard/OngoingStories";
 import PublishedStories from "../components/dashboard/PublishedStories";
 import CreateStoryModal from "../components/story/CreateStoryModal";
 import Navbar from "../components/common/Navbar";
-import {ChevronRight} from "lucide-react";
+import { ChevronRight } from "lucide-react";
+
 function Dashboard() {
   const [active, setActive] = useState("ongoing");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [collapsed, setCollapsed] = useState(false);
+  const [navbarMenuOpen, setNavbarMenuOpen] = useState(false);
 
   // Close sidebar on ESC (mobile)
   useEffect(() => {
@@ -36,7 +38,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       {/* NAVBAR */}
-      <Navbar page="Dashboard" />
+      <Navbar page="Dashboard" onMobileMenuChange={setNavbarMenuOpen} />
 
       <div className="h-[calc(100vh-4rem)] flex overflow-hidden relative">
         {/* ✅ MOBILE: Floating "Open Sidebar" button (NOT hamburger) */}
@@ -90,8 +92,8 @@ function Dashboard() {
             </div>
           )}
 
-          {active === "ongoing" && <OngoingStories />}
-          {active === "published" && <PublishedStories />}
+          {active === "ongoing" && <OngoingStories sidebarOpen={sidebarOpen} navbarMenuOpen={navbarMenuOpen} />}
+          {active === "published" && <PublishedStories sidebarOpen={sidebarOpen} navbarMenuOpen={navbarMenuOpen} />}
 
           {active === "create" && (
             <div className="pt-4">

@@ -311,12 +311,13 @@ const getPublicChapterSidebar = async (req, res) => {
       return res.status(403).json({ message: "This story is not published" });
     }
 
-    const chapters = await Chapter.find(
-      { story: storyId, isBranch: false }, // ✅ show only chapters (no branches)
-      { title: 1, order: 1 },
-    ).sort({ order: 1 });
+    const chapters = await Chapter.find({ story: storyId })
+  .select('_id title parentChapter isBranch order')
+  .sort({ order: 1 })
+  .lean();
 
-    res.status(200).json({ chapters });
+res.status(200).json({ chapters });
+
   } catch (err) {
     res.status(500).json({
       message: "Failed to load public chapter sidebar",

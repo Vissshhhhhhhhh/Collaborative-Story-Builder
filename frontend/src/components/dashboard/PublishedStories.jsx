@@ -9,7 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import CollaboratorsModal from "../story/Collaborators";
 import ConfirmModal from "../common/ConfirmModal";
 
-function PublishedStories() {
+function PublishedStories({ sidebarOpen = false, navbarMenuOpen = false }) {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -107,6 +107,8 @@ function PublishedStories() {
               isPublishedSection={true}
               hideAddCollaborator={true}
               viewOnlyCollaborators={true}
+              sidebarOpen={sidebarOpen}
+              navbarMenuOpen={navbarMenuOpen}
               onViewCollaborators={() =>
                 openViewCollaboratorsModal(story._id, story.title)
               }

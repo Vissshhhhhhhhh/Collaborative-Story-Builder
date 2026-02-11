@@ -254,7 +254,7 @@ function Welcome() {
               </p>
 
               <h2 className="mt-3 text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
-                Built for collaborative storytelling
+                Built for collaborative story writing
               </h2>
 
               <p className="mt-4 text-sm sm:text-base text-gray-600 leading-relaxed max-w-xl">
